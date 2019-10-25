@@ -18,15 +18,17 @@ import java.util.stream.Collectors;
 @Component
 @RequestScope
 public class CrawlerProcessor {
-    @Value("${headless}")
+
+    @Value("${chrome.headless}")
     private boolean headless;
+
+    @Value("${chrome.path}")
+    private String chromePath;
     private WebDriver webDriver;
 
     public void setUpWebDriver() {
-        final String chromePath = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("window-size=1024x768");
         options.setAcceptInsecureCerts(true);
 
         if (headless) {
@@ -42,10 +44,10 @@ public class CrawlerProcessor {
     public WebSite proccessUrl(final String url) {
         setUpWebDriver();
         webDriver.get(url);
-        return parseHTML(webDriver.getPageSource(), url);
+        return createWebSiteObjectFromHTML(webDriver.getPageSource(), url);
     }
 
-    public WebSite parseHTML(final String html, final String url) {
+    public WebSite createWebSiteObjectFromHTML(final String html, final String url) {
         final Document document = Jsoup.parse(html);
 
         WebSite webSite = new WebSite();
@@ -53,30 +55,32 @@ public class CrawlerProcessor {
         webSite.setTextContent(document.text());
         webSite.setTitle(document.title());
         webSite.setUrl(url);
+        webSite.setLanguage(getLanguage(document));
+        webSite.setRankedWords(extractAndRankWords(webSite.getTextContent()));
 
-        webSite.setLanguage(document.getElementsByTag("head").stream()
-                .map(s -> s.attr("lang"))
-                .findFirst()
-                .orElse("No language found."));
-        webSite.setRankedWords(extractAndRankWords(webSite));
         return webSite;
     }
 
-    public List<RankedWord> extractAndRankWords(WebSite webSite) {
+    private String getLanguage(Document document) {
+        return document.getElementsByTag("head").stream()
+                .map(s -> s.attr("lang"))
+                .findFirst()
+                .orElse("No language found.");
+    }
+
+    private List<RankedWord> extractAndRankWords(final String textContent) {
         final Map<String, Long> wordCounter = new HashMap<>();
 
-        Arrays.stream(webSite.getTextContent().split(" "))
+        Arrays.stream(textContent.split(" "))
                 .filter(s -> s.length() > 3)
                 .collect(Collectors.groupingBy(k -> k, () -> wordCounter, Collectors.counting()));
 
-        List<RankedWord> rankedWordList = wordCounter.keySet()
+        return wordCounter.keySet()
                 .stream()
                 .map(s -> new RankedWord(s, wordCounter.get(s)))
                 .sorted(Comparator.comparing(s -> s.getOcurrences() * -1))
                 .limit(50)
                 .collect(Collectors.toList());
-
-        return rankedWordList;
     }
 
     @PreDestroy

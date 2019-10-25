@@ -1,2 +1,3 @@
-headless:
-  true
+chrome:
+  path: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
+  headless: false
