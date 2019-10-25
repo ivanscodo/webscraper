@@ -18,19 +18,17 @@ public class WebCrawlerService {
     }
 
     public String create(final String url){
-        final String content = crawlerProcessor.proccessUrl(url);
+        final String jsonContent = crawlerProcessor.proccessUrl(url);
         WebSite webSite = new WebSite();
-        webSite.setContent(content);
+        webSite.setContent(jsonContent);
         webSite.setUrl(url);
         webSiteRepository.save(webSite);
-        return content;
+        return jsonContent;
     }
 
     public List<WebSite> findAll(){
         return webSiteRepository.findAll();
     }
 
-    public String parseHTMLToJson(){
-        return "adsasas";
-    }
+
 }

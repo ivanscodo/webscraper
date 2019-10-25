@@ -1,12 +1,15 @@
 package com.mongocompetition.webscraper.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 @Component
 public class CrawlerProcessor {
@@ -36,6 +39,16 @@ public class CrawlerProcessor {
     public String proccessUrl(final String url) {
         setUpWebDriver();
         webDriver.get(url);
-        return "content after proccessing";
+        return parseHTMLToJson(webDriver.getPageSource());
     }
+
+    public String parseHTMLToJson(final String html){
+        Document parse = Jsoup.parse(html);
+        Element body = parse.body();
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        return gson.toJson(body.toString());
+    }
+
 }
