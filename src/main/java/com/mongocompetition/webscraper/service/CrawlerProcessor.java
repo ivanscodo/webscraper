@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import javax.annotation.PreDestroy;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequestScope
@@ -58,15 +58,25 @@ public class CrawlerProcessor {
                 .map(s -> s.attr("lang"))
                 .findFirst()
                 .orElse("No language found."));
-        webSite.setRankedWords(extractAndRankWords(document));
+        webSite.setRankedWords(extractAndRankWords(webSite));
         return webSite;
     }
 
-    public List<RankedWord> extractAndRankWords(Document document){
-        List<RankedWord> result = new ArrayList<>();
-        result.add(new RankedWord("test1", 10));
-        result.add(new RankedWord("test2", 9));
-        return result;
+    public List<RankedWord> extractAndRankWords(WebSite webSite) {
+        final Map<String, Long> wordCounter = new HashMap<>();
+
+        Arrays.stream(webSite.getTextContent().split(" "))
+                .filter(s -> s.length() > 3)
+                .collect(Collectors.groupingBy(k -> k, () -> wordCounter, Collectors.counting()));
+
+        List<RankedWord> rankedWordList = wordCounter.keySet()
+                .stream()
+                .map(s -> new RankedWord(s, wordCounter.get(s)))
+                .sorted(Comparator.comparing(s -> s.getOcurrences() * -1))
+                .limit(50)
+                .collect(Collectors.toList());
+
+        return rankedWordList;
     }
 
     @PreDestroy

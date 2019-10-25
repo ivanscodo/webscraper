@@ -3,9 +3,9 @@ package com.mongocompetition.webscraper.dto;
 public class RankedWord {
 
     private String word;
-    private int ocurrences;
+    private Long ocurrences;
 
-    public RankedWord(String word, int ocurrences) {
+    public RankedWord(String word, Long ocurrences) {
         this.word = word;
         this.ocurrences = ocurrences;
     }
@@ -18,11 +18,11 @@ public class RankedWord {
         this.word = word;
     }
 
-    public int getOcurrences() {
+    public Long getOcurrences() {
         return ocurrences;
     }
 
-    public void setOcurrences(int ocurrences) {
+    public void setOcurrences(Long ocurrences) {
         this.ocurrences = ocurrences;
     }
 }
