@@ -1,4 +1,4 @@
-package com.mongocompetition.webscraper.controller;
+package com.mongocompetition.webscraper.dto;
 
 public class CreateRequestDTO {
     private final String url;

@@ -1,32 +1,35 @@
 package com.mongocompetition.webscraper.service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.mongocompetition.webscraper.dto.RankedWord;
+import com.mongocompetition.webscraper.model.WebSite;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
+
+import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
+@RequestScope
 public class CrawlerProcessor {
     @Value("${headless}")
     private boolean headless;
     private WebDriver webDriver;
 
-    public void setUpWebDriver(){
+    public void setUpWebDriver() {
         final String chromePath = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-        //final String chromeDriverPath = System.getProperty("user.dir");
-        //System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("window-size=1024x768");
         options.setAcceptInsecureCerts(true);
 
-        if(headless){
+        if (headless) {
             options.addArguments("--no-sandbox");
             options.setHeadless(headless);
             options.addArguments("--disable-gpu");
@@ -36,19 +39,38 @@ public class CrawlerProcessor {
         webDriver = new ChromeDriver(options);
     }
 
-    public String proccessUrl(final String url) {
+    public WebSite proccessUrl(final String url) {
         setUpWebDriver();
         webDriver.get(url);
-        return parseHTMLToJson(webDriver.getPageSource());
+        return parseHTML(webDriver.getPageSource(), url);
     }
 
-    public String parseHTMLToJson(final String html){
-        Document parse = Jsoup.parse(html);
-        Element body = parse.body();
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-        return gson.toJson(body.toString());
+    public WebSite parseHTML(final String html, final String url) {
+        final Document document = Jsoup.parse(html);
+
+        WebSite webSite = new WebSite();
+        webSite.setHtmlContent(document.toString());
+        webSite.setTextContent(document.text());
+        webSite.setTitle(document.title());
+        webSite.setUrl(url);
+
+        webSite.setLanguage(document.getElementsByTag("head").stream()
+                .map(s -> s.attr("lang"))
+                .findFirst()
+                .orElse("No language found."));
+        webSite.setRankedWords(extractAndRankWords(document));
+        return webSite;
     }
 
+    public List<RankedWord> extractAndRankWords(Document document){
+        List<RankedWord> result = new ArrayList<>();
+        result.add(new RankedWord("test1", 10));
+        result.add(new RankedWord("test2", 9));
+        return result;
+    }
+
+    @PreDestroy
+    public void closeBrowser() {
+        webDriver.close();
+    }
 }
