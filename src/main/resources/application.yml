@@ -1,3 +1,13 @@
 chrome:
   path: C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe
-  headless: false
+  headless: true
+
+spring:
+  data:
+    mongodb:
+      port: 27017
+      database: test
+      host: localhost
+#      authentication-database:
+#      username:
+#      password:
