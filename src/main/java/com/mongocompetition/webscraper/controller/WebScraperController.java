@@ -3,6 +3,8 @@ package com.mongocompetition.webscraper.controller;
 import com.mongocompetition.webscraper.dto.CreateRequestDTO;
 import com.mongocompetition.webscraper.dto.CreateResponseDTO;
 import com.mongocompetition.webscraper.service.WebCrawlerService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +25,25 @@ public class WebScraperController {
 
     @GetMapping
     @ResponseBody
+    @CrossOrigin
     public List<CreateResponseDTO> findAll(){
         return webCrawlerService.findAll();
     }
 
     @PostMapping(produces = "application/json", consumes = {"text/html", "application/x-www-form-urlencoded"})
-    public CreateResponseDTO createFromHtml(@RequestParam("url") String url){
+    @CrossOrigin
+    public ResponseEntity<CreateResponseDTO> createFromHtml(@RequestParam("url") String url){
         Assert.notNull(url, "Url cannot be null.");
         Assert.isTrue(!StringUtils.isEmpty(url), "Url cannot be empty.");
-        return webCrawlerService.create(url);
+        CreateResponseDTO createResponseDTO = webCrawlerService.create(url);
+        return ResponseEntity.status(HttpStatus.OK).body(createResponseDTO);
     }
 
     @PostMapping(produces = "application/json", consumes = "application/json")
-    public CreateResponseDTO createFromJson(@RequestBody CreateRequestDTO createRequestDTO){
-        return webCrawlerService.create(createRequestDTO.getUrl());
+    @ResponseBody
+    @CrossOrigin
+    public ResponseEntity<CreateResponseDTO> createFromJson(@RequestBody CreateRequestDTO createRequestDTO){
+        CreateResponseDTO createResponseDTO = webCrawlerService.create(createRequestDTO.getUrl());
+        return ResponseEntity.status(HttpStatus.OK).body(createResponseDTO);
     }
-
 }

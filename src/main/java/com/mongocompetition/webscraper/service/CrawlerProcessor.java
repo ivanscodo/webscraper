@@ -1,6 +1,6 @@
 package com.mongocompetition.webscraper.service;
 
-import com.mongocompetition.webscraper.dto.RankedWord;
+import com.mongocompetition.webscraper.model.RankedWord;
 import com.mongocompetition.webscraper.model.WebSite;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -78,7 +78,7 @@ public class CrawlerProcessor {
         return wordCounter.keySet()
                 .stream()
                 .map(s -> new RankedWord(s, wordCounter.get(s)))
-                .sorted(Comparator.comparing(s -> s.getOcurrences() * -1))
+                .sorted(Comparator.comparing(s -> s.getNumberOfOcurrences() * -1))
                 .limit(50)
                 .collect(Collectors.toList());
     }

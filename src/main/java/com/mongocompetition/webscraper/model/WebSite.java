@@ -1,6 +1,5 @@
 package com.mongocompetition.webscraper.model;
 
-import com.mongocompetition.webscraper.dto.RankedWord;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

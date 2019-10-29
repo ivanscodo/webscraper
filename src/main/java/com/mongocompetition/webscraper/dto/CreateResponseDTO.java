@@ -1,5 +1,7 @@
 package com.mongocompetition.webscraper.dto;
 
+import com.mongocompetition.webscraper.model.RankedWord;
+
 import java.util.ArrayList;
 import java.util.List;
 
