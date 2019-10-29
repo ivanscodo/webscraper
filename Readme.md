@@ -10,8 +10,9 @@ MongoDB offers a lot of flexibility and due to his schemaless nature it is easie
 <p>Since you've installed the JVM, the google chrome web browser and a MongoDB instance is running and configured properly, let's set up the application</p>
 <ol>
     <li>Edit the application.yml file</li>
-    <li>Replace the line path (which references the path to the google chrome application, changing this value (C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe) to the correct path on your machine. Please keep the double bars as it is.</li>
+    <li>Replace the line path (which references the path to the google chrome application, changing this value (C:\Program Files (x86)\Google\Chrome\Application\chrome.exe) to the correct path on your machine. Please keep the double bars as it is.</li>
     <li>The google chrome will run on headless mode which means you won't be able to see when it accesses the web page you inputed so if you want to see the browser running just set the value of this parameter to true</li>
+    <li>We don't recommend commiting jar files but just to save you some time and effort to configure maven and downloading all the dependencies we added the jar file to this repo.</li>
     <li>Run the command <code>java -jar webscraper</code> on the main folder and wait until the end of the startup process</li>
     <li>Access the folder webscraper-html under the main folder and run the index.html file</li>
 </ol>
