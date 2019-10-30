@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrap 4, from LayoutIt!</title>
+
+    <meta name="description" content="Source code generated using layoutit.com">
+    <meta name="author" content="LayoutIt!">
+
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<br />
+			<h3>
+				WebScrapper for Mongo Competition
+			</h3>
+			<br />
+			<form role="form" id="form">
+				<div class="form-group">
+					 
+					<label for="url">
+						URL
+					</label>
+					<input type="url" class="form-control" id="url" name="url" placeholder="Example: http://www.google.com.br">
+					
+
+				</div>
+				<button type="button" id="submitButton" class="btn btn-primary">
+					Submit
+				</button>
+			</form>
+			<br />
+			<br />
+			<table class="table table-bordered table-hover table-sm" style="display: none;" id="dataTable">
+				<thead>
+					<tr>
+						<th>
+							#
+						</th>
+						<th>
+							URL
+						</th>
+						<th>
+							Title
+						</th>
+						<th>
+							Language
+						</th>
+						<th>
+							Ranked Words
+						</th>
+					</tr>
+				</thead>
+				<tbody id="tableBody">
+					
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div id="div1"></div>
+</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+	<script src="js/scripts.js"></script>
+
+	<script type="text/javascript">
+		findAll();
+		$("#submitButton").click(submitForm);
+			function submitForm(){
+			var url = $("#url").val();
+			$.ajax({
+				url: "http://localhost:8080/webscraper",
+				type: "POST",
+				dataType: "json",
+				contentType: "application/json",
+				data: JSON.stringify(url),
+				success: function(data){
+					findAll();
+				}
+			});
+		}
+
+		function findAll(){
+			$.ajax({
+				url: "http://localhost:8080/webscraper", 
+				type: "GET",  
+				success: function(result){
+					var content = "";
+					for (let index = 0; index < result.length; index++) {
+						const element = result[index];
+						content += "<tr>";
+						content += "<td>" + index + "</td>";
+						content += "<td>" + element.url + "</td>";
+						content += "<td>" + element.title + "</td>";
+						content += "<td>" + element.language + "</td>";
+						content += "<td>";
+						content += "<div id='card-" + index + "'>";
+						content += "<div class ='card'>"; 
+						content += "<a class='collapsed' data-toggle='collapse' data-parent='#card-" + index + "' href='#card-element-" + index +"'>Click to see the frequency of the words</a>"; 
+						content += "<div id='card-element-" + index + "' class='collapse'>"; 
+						content += "<div class='card-body'>";
+						for (let counter = 0; counter < element.rankedWords.length; counter++) {
+							content += "<p>" + "word: " + element.rankedWords[counter].word + " - Frequency: " + element.rankedWords[counter].numberOfOcurrences + "</p>"; 
+						}	
+	
+						content += "</div>"; 
+						content += "</div>"; 
+						content += "</div>"; 
+						content += "</div>"; 
+						content += "</td>";	
+						content += "</tr>";
+					}
+					if(result.length>0){
+						$("#dataTable").css("display","table");
+						$("#tableBody").html("");
+						$("#tableBody").append(content);
+					}
+			}
+		});
+	}
+	</script>
+  </body>
+</html>
