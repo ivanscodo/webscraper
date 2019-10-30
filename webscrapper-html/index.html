@@ -12,7 +12,37 @@
 
     <link href="css/bootstrap.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+	<style>
 
+			.spinner {
+			display: block;
+			margin-left: auto;
+			margin-right: auto;
+			width: 40%;
+			}
+
+			.loader {
+			  border: 16px solid #f3f3f3;
+			  border-radius: 50%;
+			  border-top: 16px solid #3498db;
+			  width: 120px;
+			  height: 120px;
+			  -webkit-animation: spin 2s linear infinite; /* Safari */
+			  animation: spin 2s linear infinite;
+			  
+			}
+			
+			/* Safari */
+			@-webkit-keyframes spin {
+			  0% { -webkit-transform: rotate(0deg); }
+			  100% { -webkit-transform: rotate(360deg); }
+			}
+			
+			@keyframes spin {
+			  0% { transform: rotate(0deg); }
+			  100% { transform: rotate(360deg); }
+			}
+			</style>
   </head>
   <body>
 
@@ -30,7 +60,10 @@
 					<label for="url">
 						URL
 					</label>
-					<input type="url" class="form-control" id="url" name="url" placeholder="Example: http://www.google.com.br">
+					<label id="errorMessage" style="margin-left: 20px; color: red;"></label>
+					<input type="url" class="form-control" 
+					id="url" name="url" 
+					placeholder="Example: http://www.google.com.br"> 
 					
 
 				</div>
@@ -39,6 +72,12 @@
 				</button>
 			</form>
 			<br />
+			<br />
+			<div id="loadingDiv">
+				<p style="text-align: center;">Please wait. We are processing your request.</p>
+				<div class="loader spinner">
+				</div>
+			</div>
 			<br />
 			<table class="table table-bordered table-hover table-sm" style="display: none;" id="dataTable">
 				<thead>
@@ -66,7 +105,6 @@
 			</table>
 		</div>
 	</div>
-	<div id="div1"></div>
 </div>
 
     <script src="js/jquery.min.js"></script>
@@ -78,6 +116,11 @@
 		$("#submitButton").click(submitForm);
 			function submitForm(){
 			var url = $("#url").val();
+			if(url == '' || url == undefined){
+				$("#errorMessage").html('* Url is required.');
+				return;
+			}
+			$("#errorMessage").html('');
 			$.ajax({
 				url: "http://localhost:8080/webscraper",
 				type: "POST",
@@ -86,6 +129,7 @@
 				data: JSON.stringify(url),
 				success: function(data){
 					findAll();
+					$("#url").val("");
 				}
 			});
 		}
@@ -128,6 +172,18 @@
 			}
 		});
 	}
+
+	var $loadingDiv = $('#loadingDiv').hide();
+	var $dataTable = $('#dataTable').show();
+	$(document)
+	.ajaxStart(function () {
+		$loadingDiv.show();
+		$dataTable.hide();
+	})
+	.ajaxStop(function () {
+		$loadingDiv.hide();
+		$dataTable.show();
+	});
 	</script>
   </body>
 </html>
